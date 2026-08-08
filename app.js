@@ -220,9 +220,15 @@ movementForm.addEventListener("submit", async (event) => {
   }
 
   const totals = calculateBalances(movements);
-  if (selectedType === "card_payment" && amount > Math.max(0, totals.card)) {
-    showMessage("El pago no puede ser mayor que el saldo de la tarjeta.", "error");
-    return;
+  if (
+  ((selectedType === "expense" || selectedType === "card_payment") &&
+    amount > totals.current) ||
+  (selectedType === "card_payment" &&
+    amount > Math.max(0, totals.card))
+) {
+  showMessage("Saldo insuficiente", "error");
+  return;
+}
   }
 
   setSaving(true);
