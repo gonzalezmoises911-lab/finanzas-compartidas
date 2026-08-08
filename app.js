@@ -221,14 +221,13 @@ movementForm.addEventListener("submit", async (event) => {
 
   const totals = calculateBalances(movements);
   if (
-  ((selectedType === "expense" || selectedType === "card_payment") &&
-    amount > totals.current) ||
-  (selectedType === "card_payment" &&
-    amount > Math.max(0, totals.card))
-) {
-  showMessage("Saldo insuficiente", "error");
-  return;
-}
+    ((selectedType === "expense" || selectedType === "card_payment") &&
+      amount > totals.current) ||
+    (selectedType === "card_payment" &&
+      amount > Math.max(0, totals.card))
+  ) {
+    showMessage("Saldo insuficiente", "error");
+    return;
   }
 
   setSaving(true);
