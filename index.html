@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14833b">
+  <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
+  <title>Finanzas Compartidas</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Control compartido</p>
+        <h1>Finanzas</h1>
+      </div>
+      <div id="connectionStatus" class="status-pill" aria-live="polite">Conectando…</div>
+    </header>
+
+    <section class="balance-card balance-main" aria-label="Saldo actual">
+      <div>
+        <p>Saldo actual</p>
+        <strong id="currentBalance">₡0</strong>
+      </div>
+      <div class="balance-icon" aria-hidden="true">💰</div>
+    </section>
+
+    <section class="balance-card balance-card-credit" aria-label="Saldo de tarjeta de crédito">
+      <div>
+        <p>Tarjeta de crédito</p>
+        <strong id="cardBalance">₡0</strong>
+      </div>
+      <div class="balance-icon" aria-hidden="true">💳</div>
+    </section>
+
+    <section class="panel">
+      <h2>Registrar movimiento</h2>
+
+      <div class="movement-types" role="group" aria-label="Tipo de movimiento">
+        <button type="button" class="type-button active" data-type="income">Ingreso</button>
+        <button type="button" class="type-button" data-type="expense">Gasto</button>
+        <button type="button" class="type-button" data-type="card_purchase">Compra tarjeta</button>
+        <button type="button" class="type-button" data-type="card_payment">Pago tarjeta</button>
+      </div>
+
+      <form id="movementForm" novalidate>
+        <label for="amount">Monto</label>
+        <div class="input-with-prefix">
+          <span>₡</span>
+          <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
+        </div>
+
+        <label for="description">Descripción</label>
+        <input id="description" name="description" type="text" maxlength="80" autocomplete="off" placeholder="Ej. Supermercado" required>
+
+        <label for="date">Fecha</label>
+        <input id="date" name="date" type="date" required>
+
+        <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
+        <p id="formMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="panel history-panel">
+      <div class="section-heading">
+        <h2>Histórico</h2>
+        <span id="movementCount" class="count-badge">0</span>
+      </div>
+      <div id="historyList" class="history-list">
+        <p class="empty-state">Todavía no hay movimientos.</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="confirmDialog">
+    <form method="dialog" class="dialog-card">
+      <h2>Eliminar movimiento</h2>
+      <p>Esta acción actualizará ambos saldos y no se puede deshacer.</p>
+      <div class="dialog-actions">
+        <button value="cancel" class="secondary-button">Cancelar</button>
+        <button id="confirmDeleteButton" value="confirm" class="danger-button">Eliminar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
