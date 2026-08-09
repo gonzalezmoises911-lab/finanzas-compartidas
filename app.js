@@ -262,7 +262,7 @@ movementForm.addEventListener("submit", async (event) => {
   }
 
   if (!description) {
-    showMessage("Selecciona una categoría.", "error");
+    showMessage("Escribe una descripción.", "error");
     descriptionInput.focus();
     return;
   }
