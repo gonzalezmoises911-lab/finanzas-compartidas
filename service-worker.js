@@ -1,4 +1,4 @@
-const CACHE_NAME = "finanzas-compartidas-v7";
+const CACHE_NAME = "finanzas-compartidas-v8";
 const APP_SHELL = [
   "./",
   "./index.html",

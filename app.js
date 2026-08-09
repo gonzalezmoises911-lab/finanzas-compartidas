@@ -24,8 +24,8 @@ const movementsRef = collection(db, "movimientos");
 
 const typeLabels = {
   income: "Ingreso",
-  expense: "Gasto",
-  card_purchase: "Compra con tarjeta",
+  expense: "Gasto débito",
+  card_purchase: "Gasto crédito",
   card_payment: "Pago de tarjeta"
 };
 
@@ -87,10 +87,13 @@ function calculateBalances(items) {
           totals.current -= amount;
           break;
         case "card_purchase":
+          // El gasto a crédito reduce el saldo real disponible y aumenta la deuda.
+          totals.current -= amount;
           totals.card += amount;
           break;
         case "card_payment":
-          totals.current -= amount;
+          // La compra a crédito ya fue descontada del saldo real.
+          // Pagar la tarjeta solo reduce la deuda para no contar el gasto dos veces.
           totals.card -= amount;
           break;
       }
@@ -208,7 +211,7 @@ movementForm.addEventListener("submit", async (event) => {
   }
 
   if (!description) {
-    showMessage("Escribe una descripción.", "error");
+    showMessage("Selecciona una categoría.", "error");
     descriptionInput.focus();
     return;
   }
@@ -221,10 +224,8 @@ movementForm.addEventListener("submit", async (event) => {
 
   const totals = calculateBalances(movements);
   if (
-    ((selectedType === "expense" || selectedType === "card_payment") &&
-      amount > totals.current) ||
-    (selectedType === "card_payment" &&
-      amount > Math.max(0, totals.card))
+    (selectedType === "expense" && amount > totals.current) ||
+    (selectedType === "card_payment" && amount > Math.max(0, totals.card))
   ) {
     showMessage("Saldo insuficiente", "error");
     return;
@@ -304,60 +305,3 @@ window.addEventListener("offline", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(console.error));
 }
-
-
-// === Sistema de actualización de Finanzas Compartidas ===
-function mostrarAvisoActualizacion(worker) {
-  let aviso = document.querySelector("#avisoActualizacion");
-  if (!aviso) {
-    aviso = document.createElement("div");
-    aviso.id = "avisoActualizacion";
-    aviso.style.cssText = "position:fixed;left:12px;right:12px;bottom:18px;z-index:9999;max-width:520px;margin:auto;padding:14px 15px;border-radius:16px;background:#fff;color:#17212b;box-shadow:0 12px 35px rgba(0,0,0,.22);border:1px solid #dfe7e3;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;";
-    aviso.innerHTML = '<div style="display:flex;align-items:center;gap:12px"><div style="flex:1"><strong style="display:block;font-size:15px">Nueva versión disponible</strong><span style="display:block;margin-top:2px;font-size:13px;color:#64706b">Hay mejoras listas para instalar.</span></div><button id="botonActualizarApp" type="button" style="border:0;border-radius:11px;padding:10px 14px;background:#16855b;color:#fff;font-weight:700">Actualizar</button></div>';
-    document.body.appendChild(aviso);
-  }
-  const boton = aviso.querySelector("#botonActualizarApp");
-  boton.onclick = () => {
-    boton.disabled = true;
-    boton.textContent = "Actualizando…";
-    worker.postMessage({ type: "SKIP_WAITING" });
-  };
-}
-
-if ("serviceWorker" in navigator) {
-  let recargandoPorActualizacion = false;
-
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (recargandoPorActualizacion) return;
-    recargandoPorActualizacion = true;
-    window.location.reload();
-  });
-
-  window.addEventListener("load", async () => {
-    try {
-      const registro = await navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" });
-
-      if (registro.waiting && navigator.serviceWorker.controller) {
-        mostrarAvisoActualizacion(registro.waiting);
-      }
-
-      registro.addEventListener("updatefound", () => {
-        const nuevoWorker = registro.installing;
-        if (!nuevoWorker) return;
-        nuevoWorker.addEventListener("statechange", () => {
-          if (nuevoWorker.state === "installed" && navigator.serviceWorker.controller) {
-            mostrarAvisoActualizacion(nuevoWorker);
-          }
-        });
-      });
-
-      await registro.update();
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") registro.update().catch(() => {});
-      });
-    } catch (error) {
-      console.error("Error revisando actualización:", error);
-    }
-  });
-}
-

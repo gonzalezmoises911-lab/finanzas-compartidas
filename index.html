@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#14833b">
   <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=4">
+  <link rel="manifest" href="./manifest.webmanifest?v=8">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=4">
+  <link rel="stylesheet" href="./styles.css?v=8">
 </head>
 <body>
   <main class="app-shell">
@@ -42,9 +42,9 @@
 
       <div class="movement-types" role="group" aria-label="Tipo de movimiento">
         <button type="button" class="type-button active" data-type="income">Ingreso</button>
-        <button type="button" class="type-button" data-type="expense">Gasto</button>
-        <button type="button" class="type-button" data-type="card_purchase">Compra tarjeta</button>
-        <button type="button" class="type-button" data-type="card_payment">Pago tarjeta</button>
+        <button type="button" class="type-button" data-type="expense">Gasto débito</button>
+        <button type="button" class="type-button" data-type="card_purchase">Gasto crédito</button>
+        <button type="button" class="type-button" data-type="card_payment">Pago de tarjeta</button>
       </div>
 
       <form id="movementForm" novalidate>
@@ -106,6 +106,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=4"></script>
+  <script type="module" src="./app.js?v=8"></script>
 </body>
 </html>
