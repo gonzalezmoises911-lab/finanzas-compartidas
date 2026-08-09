@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#14833b">
   <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=3">
+  <link rel="manifest" href="./manifest.webmanifest?v=4">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=3">
+  <link rel="stylesheet" href="./styles.css?v=4">
 </head>
 <body>
   <main class="app-shell">
@@ -54,8 +54,27 @@
           <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
         </div>
 
-        <label for="description">Descripción</label>
-        <input id="description" name="description" type="text" maxlength="80" autocomplete="off" placeholder="Ej. Supermercado" required>
+        <label for="description">Categoría</label>
+        <select
+          id="description"
+          name="description"
+          required
+          style="width:100%;min-height:48px;border:1px solid #dde5df;border-radius:12px;background:#fff;color:#16211a;padding:11px 13px;font:inherit;outline:none;"
+        >
+          <option value="">Seleccionar categoría…</option>
+          <option value="🛒 Alimentación y hogar">🛒 Alimentación y hogar</option>
+          <option value="🍽️ Comidas y salidas">🍽️ Comidas y salidas</option>
+          <option value="🚗 Transporte y vehículo">🚗 Transporte y vehículo</option>
+          <option value="🏥 Salud y farmacia">🏥 Salud y farmacia</option>
+          <option value="🐾 Mascotas">🐾 Mascotas</option>
+          <option value="🏠 Casa y servicios">🏠 Casa y servicios</option>
+          <option value="💳 Préstamos">💳 Préstamos</option>
+          <option value="📺 Suscripciones">📺 Suscripciones</option>
+          <option value="📦 Compras en línea">📦 Compras en línea</option>
+          <option value="👕 Ropa y calzado">👕 Ropa y calzado</option>
+          <option value="👶 Bebé">👶 Bebé</option>
+          <option value="🔧 Otros gastos">🔧 Otros gastos</option>
+        </select>
 
         <label for="date">Fecha</label>
         <input id="date" name="date" type="date" required>
@@ -87,6 +106,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=3"></script>
+  <script type="module" src="./app.js?v=4"></script>
 </body>
 </html>
