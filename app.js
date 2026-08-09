@@ -4,6 +4,7 @@ import {
   collection,
   addDoc,
   deleteDoc,
+  updateDoc,
   doc,
   onSnapshot,
   serverTimestamp
@@ -32,6 +33,7 @@ const typeLabels = {
 let selectedType = "income";
 let movements = [];
 let pendingDeleteId = null;
+let editingMovementId = null;
 
 const currentBalanceEl = document.querySelector("#currentBalance");
 const cardBalanceEl = document.querySelector("#cardBalance");
@@ -46,6 +48,7 @@ const formMessage = document.querySelector("#formMessage");
 const connectionStatus = document.querySelector("#connectionStatus");
 const confirmDialog = document.querySelector("#confirmDialog");
 const confirmDeleteButton = document.querySelector("#confirmDeleteButton");
+const cancelEditButton = document.querySelector("#cancelEditButton");
 
 function todayAsLocalISO() {
   const now = new Date();
@@ -166,12 +169,24 @@ function render() {
     const amount = document.createElement("div");
     amount.className = `history-amount ${visual.amountClass}`.trim();
     amount.textContent = `${visual.sign}${formatCurrency(Number(movement.amount) || 0)}`;
+    const actions = document.createElement("div");
+    actions.style.cssText = "display:flex;justify-content:flex-end;gap:10px;margin-top:4px;";
+
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.className = "edit-button";
+    editButton.textContent = "Editar";
+    editButton.dataset.id = movement.id;
+    editButton.style.cssText = "border:0;background:transparent;color:#167a4b;padding:0;font-size:12px;";
+
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "delete-button";
     deleteButton.textContent = "Eliminar";
     deleteButton.dataset.id = movement.id;
-    amountBox.append(amount, deleteButton);
+
+    actions.append(editButton, deleteButton);
+    amountBox.append(amount, actions);
 
     item.append(icon, info, amountBox);
     historyListEl.append(item);
@@ -185,14 +200,50 @@ function showMessage(message, kind = "") {
 
 function setSaving(isSaving) {
   saveButton.disabled = isSaving;
-  saveButton.textContent = isSaving ? "Guardando…" : "Guardar movimiento";
+  saveButton.textContent = isSaving
+    ? "Guardando…"
+    : (editingMovementId ? "Guardar cambios" : "Guardar movimiento");
 }
+
+
+function selectMovementType(type) {
+  selectedType = type;
+  document.querySelectorAll(".type-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.type === type);
+  });
+}
+
+function startEditing(movementId) {
+  const movement = movements.find((item) => item.id === movementId);
+  if (!movement) return;
+
+  editingMovementId = movement.id;
+  selectMovementType(movement.type);
+  amountInput.value = new Intl.NumberFormat("es-CR").format(Number(movement.amount) || 0);
+  descriptionInput.value = movement.description;
+  dateInput.value = movement.date;
+  saveButton.textContent = "Guardar cambios";
+  cancelEditButton.hidden = false;
+  showMessage("Editando movimiento.", "success");
+  movementForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function cancelEditing() {
+  editingMovementId = null;
+  movementForm.reset();
+  selectMovementType("income");
+  dateInput.value = todayAsLocalISO();
+  amountInput.value = "";
+  saveButton.textContent = "Guardar movimiento";
+  cancelEditButton.hidden = true;
+  showMessage("");
+}
+
+cancelEditButton.addEventListener("click", cancelEditing);
 
 for (const button of document.querySelectorAll(".type-button")) {
   button.addEventListener("click", () => {
-    selectedType = button.dataset.type;
-    document.querySelectorAll(".type-button").forEach((item) => item.classList.remove("active"));
-    button.classList.add("active");
+    selectMovementType(button.dataset.type);
   });
 }
 
@@ -222,7 +273,11 @@ movementForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  const totals = calculateBalances(movements);
+  const movementsWithoutCurrent = editingMovementId
+    ? movements.filter((movement) => movement.id !== editingMovementId)
+    : movements;
+  const totals = calculateBalances(movementsWithoutCurrent);
+
   if (
     (selectedType === "expense" && amount > totals.current) ||
     (selectedType === "card_payment" && amount > Math.max(0, totals.card))
@@ -233,17 +288,32 @@ movementForm.addEventListener("submit", async (event) => {
 
   setSaving(true);
   try {
-    await addDoc(movementsRef, {
-      type: selectedType,
-      amount,
-      description,
-      date,
-      createdAt: serverTimestamp()
-    });
+    if (editingMovementId) {
+      await updateDoc(doc(db, "movimientos", editingMovementId), {
+        type: selectedType,
+        amount,
+        description,
+        date
+      });
+      editingMovementId = null;
+      cancelEditButton.hidden = true;
+      showMessage("Movimiento actualizado correctamente.", "success");
+    } else {
+      await addDoc(movementsRef, {
+        type: selectedType,
+        amount,
+        description,
+        date,
+        createdAt: serverTimestamp()
+      });
+      showMessage("Movimiento guardado.", "success");
+    }
+
     movementForm.reset();
+    selectMovementType("income");
     dateInput.value = todayAsLocalISO();
     amountInput.value = "";
-    showMessage("Movimiento guardado.", "success");
+    saveButton.textContent = "Guardar movimiento";
   } catch (error) {
     console.error(error);
     showMessage("No se pudo guardar. Revisa la conexión o las reglas de Firebase.", "error");
@@ -253,9 +323,15 @@ movementForm.addEventListener("submit", async (event) => {
 });
 
 historyListEl.addEventListener("click", (event) => {
-  const button = event.target.closest(".delete-button");
-  if (!button) return;
-  pendingDeleteId = button.dataset.id;
+  const editButton = event.target.closest(".edit-button");
+  if (editButton) {
+    startEditing(editButton.dataset.id);
+    return;
+  }
+
+  const deleteButton = event.target.closest(".delete-button");
+  if (!deleteButton) return;
+  pendingDeleteId = deleteButton.dataset.id;
   confirmDialog.showModal();
 });
 
@@ -302,6 +378,66 @@ window.addEventListener("offline", () => {
   connectionStatus.className = "status-pill offline";
 });
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(console.error));
+
+// Sistema de actualización de la aplicación.
+function showAppUpdate(worker) {
+  let banner = document.querySelector("#appUpdateBanner");
+
+  if (!banner) {
+    banner = document.createElement("div");
+    banner.id = "appUpdateBanner";
+    banner.style.cssText = "position:fixed;left:12px;right:12px;bottom:18px;z-index:9999;max-width:520px;margin:auto;padding:14px 15px;border-radius:16px;background:#fff;color:#17212b;box-shadow:0 12px 35px rgba(0,0,0,.22);border:1px solid #dfe7e3;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;";
+    banner.innerHTML = '<div style="display:flex;align-items:center;gap:12px"><div style="flex:1"><strong style="display:block;font-size:15px">Nueva versión disponible</strong><span style="display:block;margin-top:2px;font-size:13px;color:#64706b">Hay mejoras listas para instalar.</span></div><button id="appUpdateButton" type="button" style="border:0;border-radius:11px;padding:10px 14px;background:#16855b;color:#fff;font-weight:700">Actualizar</button></div>';
+    document.body.appendChild(banner);
+  }
+
+  const button = banner.querySelector("#appUpdateButton");
+  button.onclick = () => {
+    button.disabled = true;
+    button.textContent = "Actualizando…";
+    worker.postMessage({ type: "SKIP_WAITING" });
+  };
 }
+
+if ("serviceWorker" in navigator) {
+  let refreshing = false;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("./service-worker.js", {
+        updateViaCache: "none"
+      });
+
+      if (registration.waiting && navigator.serviceWorker.controller) {
+        showAppUpdate(registration.waiting);
+      }
+
+      registration.addEventListener("updatefound", () => {
+        const worker = registration.installing;
+        if (!worker) return;
+
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            showAppUpdate(worker);
+          }
+        });
+      });
+
+      await registration.update();
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          registration.update().catch(() => {});
+        }
+      });
+    } catch (error) {
+      console.error("No se pudo revisar actualizaciones:", error);
+    }
+  });
+}
+

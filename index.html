@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#14833b">
   <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=8">
+  <link rel="manifest" href="./manifest.webmanifest?v=9">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=8">
+  <link rel="stylesheet" href="./styles.css?v=9">
 </head>
 <body>
   <main class="app-shell">
@@ -80,6 +80,10 @@
         <input id="date" name="date" type="date" required>
 
         <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
+        <button id="cancelEditButton" type="button" hidden
+          style="width:100%;margin-top:8px;border:1px solid #d8e2dc;border-radius:12px;background:#fff;color:#37443d;padding:12px;font-weight:700;">
+          Cancelar edición
+        </button>
         <p id="formMessage" class="form-message" aria-live="polite"></p>
       </form>
     </section>
@@ -106,6 +110,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=8"></script>
+  <script type="module" src="./app.js?v=9"></script>
 </body>
 </html>
