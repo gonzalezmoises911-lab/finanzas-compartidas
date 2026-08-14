@@ -273,19 +273,6 @@ movementForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  const movementsWithoutCurrent = editingMovementId
-    ? movements.filter((movement) => movement.id !== editingMovementId)
-    : movements;
-  const totals = calculateBalances(movementsWithoutCurrent);
-
-  if (
-    (selectedType === "expense" && amount > totals.current) ||
-    (selectedType === "card_payment" && amount > Math.max(0, totals.card))
-  ) {
-    showMessage("Saldo insuficiente", "error");
-    return;
-  }
-
   setSaving(true);
   try {
     if (editingMovementId) {
