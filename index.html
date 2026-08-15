@@ -6,10 +6,11 @@
   <meta name="theme-color" content="#14833b">
   <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=11">
+  <link rel="manifest" href="./manifest.webmanifest?v=12">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=11">
+  <link rel="stylesheet" href="./styles.css?v=12">
+  <link rel="stylesheet" href="./categories-v12.css?v=12">
 </head>
 <body>
   <main class="app-shell">
@@ -21,76 +22,149 @@
       <div id="connectionStatus" class="status-pill" aria-live="polite">Conectando…</div>
     </header>
 
-    <section class="balance-card balance-main" aria-label="Saldo actual">
-      <div>
-        <p>Saldo actual</p>
-        <strong id="currentBalance">₡0</strong>
-      </div>
-      <div class="balance-icon" aria-hidden="true">💰</div>
-    </section>
+    <section id="viewHome" class="app-view">
+      <section class="balance-card balance-main" aria-label="Saldo actual">
+        <div>
+          <p>Saldo actual</p>
+          <strong id="currentBalance">₡0</strong>
+        </div>
+        <div class="balance-icon" aria-hidden="true">💰</div>
+      </section>
 
-    <section class="balance-card balance-card-credit" aria-label="Saldo de tarjeta de crédito">
-      <div>
-        <p>Tarjeta de crédito</p>
-        <strong id="cardBalance">₡0</strong>
-      </div>
-      <div class="balance-icon" aria-hidden="true">💳</div>
-    </section>
+      <section class="balance-card balance-card-credit" aria-label="Saldo de tarjeta de crédito">
+        <div>
+          <p>Tarjeta de crédito</p>
+          <strong id="cardBalance">₡0</strong>
+        </div>
+        <div class="balance-icon" aria-hidden="true">💳</div>
+      </section>
 
-    <section class="panel">
-      <h2>Registrar movimiento</h2>
+      <section class="panel">
+        <h2>Registrar movimiento</h2>
 
-      <div class="movement-types" role="group" aria-label="Tipo de movimiento">
-        <button type="button" class="type-button active" data-type="income">Ingreso</button>
-        <button type="button" class="type-button" data-type="expense">Gasto débito</button>
-        <button type="button" class="type-button" data-type="card_purchase">Gasto crédito</button>
-        <button type="button" class="type-button" data-type="card_payment">Pago de tarjeta</button>
-      </div>
-
-      <form id="movementForm" novalidate>
-        <label for="amount">Monto</label>
-        <div class="input-with-prefix">
-          <span>₡</span>
-          <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
+        <div class="movement-types" role="group" aria-label="Tipo de movimiento">
+          <button type="button" class="type-button active" data-type="income">Ingreso</button>
+          <button type="button" class="type-button" data-type="expense">Gasto débito</button>
+          <button type="button" class="type-button" data-type="card_purchase">Gasto crédito</button>
+          <button type="button" class="type-button" data-type="card_payment">Pago de tarjeta</button>
         </div>
 
-        <label for="description">Descripción</label>
-        <input
-          id="description"
-          name="description"
-          type="text"
-          maxlength="100"
-          placeholder="Ej. Supermercado, gasolina, Amazon…"
-          required
-        >
+        <form id="movementForm" novalidate>
+          <label for="amount">Monto</label>
+          <div class="input-with-prefix">
+            <span>₡</span>
+            <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
+          </div>
 
-        <label for="date">Fecha</label>
-        <input id="date" name="date" type="date" required>
+          <label for="description">Descripción</label>
+          <input
+            id="description"
+            name="description"
+            type="text"
+            maxlength="100"
+            placeholder="Ej. Walmart, Carnicería Ticol, Amazon…"
+            required
+          >
 
-        <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
-        <button id="cancelEditButton" type="button" hidden
-          style="width:100%;margin-top:8px;border:1px solid #d8e2dc;border-radius:12px;background:#fff;color:#37443d;padding:12px;font-weight:700;">
-          Cancelar edición
-        </button>
-        <p id="formMessage" class="form-message" aria-live="polite"></p>
-      </form>
+          <div id="categoryField" class="category-field" hidden>
+            <label for="category">Categoría</label>
+            <select id="category" name="category">
+              <option value="">Seleccionar categoría…</option>
+              <option value="Comida rápida">🍔 Comida rápida</option>
+              <option value="Supermercado">🛒 Supermercado</option>
+              <option value="Carnicería">🥩 Carnicería</option>
+              <option value="Farmacia">💊 Farmacia</option>
+              <option value="Veterinaria">🐾 Veterinaria</option>
+              <option value="Servicios públicos">💡 Servicios públicos</option>
+              <option value="Mantenimiento vehículo">🔧 Mantenimiento vehículo</option>
+              <option value="Bancos">🏦 Bancos</option>
+              <option value="Servicios de casa">🏠 Servicios de casa</option>
+              <option value="Compras en línea">📦 Compras en línea</option>
+              <option value="Aseo">🧹 Aseo</option>
+            </select>
+          </div>
+
+          <label for="date">Fecha</label>
+          <input id="date" name="date" type="date" required>
+
+          <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
+          <button id="cancelEditButton" type="button" hidden class="cancel-edit-button">
+            Cancelar edición
+          </button>
+          <p id="formMessage" class="form-message" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel category-panel">
+        <div class="section-heading category-heading">
+          <div>
+            <h2>Gastos por categoría</h2>
+            <p id="categoryPeriod" class="section-subtitle"></p>
+          </div>
+        </div>
+        <div id="categorySummary" class="category-summary">
+          <p class="empty-state">Todavía no hay gastos este mes.</p>
+        </div>
+      </section>
     </section>
 
-    <section class="panel history-panel">
-      <div class="section-heading">
-        <h2>Histórico</h2>
-        <span id="movementCount" class="count-badge">0</span>
+    <section id="viewHistory" class="app-view" hidden>
+      <div class="page-heading">
+        <button class="back-button" data-go="home" type="button" aria-label="Volver">←</button>
+        <div>
+          <h2>Histórico</h2>
+          <p>Movimientos agrupados por mes y año.</p>
+        </div>
       </div>
-      <div id="historyList" class="history-list">
-        <p class="empty-state">Todavía no hay movimientos.</p>
+      <section class="panel">
+        <div id="monthGroups" class="month-groups">
+          <p class="empty-state">Todavía no hay movimientos.</p>
+        </div>
+      </section>
+    </section>
+
+    <section id="viewMonth" class="app-view" hidden>
+      <div class="page-heading">
+        <button class="back-button" data-go="history" type="button" aria-label="Volver">←</button>
+        <div>
+          <h2 id="monthDetailTitle">Mes</h2>
+          <p id="monthDetailSubtitle"></p>
+        </div>
       </div>
+      <section class="panel">
+        <div id="monthDetailList" class="history-list"></div>
+      </section>
+    </section>
+
+    <section id="viewCategory" class="app-view" hidden>
+      <div class="page-heading">
+        <button class="back-button" data-go="home" type="button" aria-label="Volver">←</button>
+        <div>
+          <h2 id="categoryDetailTitle">Categoría</h2>
+          <p id="categoryDetailSubtitle"></p>
+        </div>
+      </div>
+      <section class="panel">
+        <div id="categoryDetailList" class="history-list"></div>
+      </section>
     </section>
   </main>
+
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <button id="navHome" class="bottom-nav-button active" type="button" data-go="home">
+      <span>⌂</span>
+      <small>Inicio</small>
+    </button>
+    <button id="navHistory" class="bottom-nav-button" type="button" data-go="history">
+      <span>◷</span>
+      <small>Histórico</small>
+    </button>
+  </nav>
 
   <dialog id="confirmDialog">
     <form method="dialog" class="dialog-card">
       <h2>Eliminar movimiento</h2>
-      <p>Esta acción actualizará ambos saldos y no se puede deshacer.</p>
+      <p>Esta acción actualizará los saldos y no se puede deshacer.</p>
       <div class="dialog-actions">
         <button value="cancel" class="secondary-button">Cancelar</button>
         <button id="confirmDeleteButton" value="confirm" class="danger-button">Eliminar</button>
@@ -98,6 +172,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=11"></script>
+  <script type="module" src="./app.js?v=12"></script>
 </body>
 </html>

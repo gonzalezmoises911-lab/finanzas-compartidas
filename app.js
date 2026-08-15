@@ -30,18 +30,49 @@ const typeLabels = {
   card_payment: "Pago de tarjeta"
 };
 
+const categories = [
+  "Comida rápida",
+  "Supermercado",
+  "Carnicería",
+  "Farmacia",
+  "Veterinaria",
+  "Servicios públicos",
+  "Mantenimiento vehículo",
+  "Bancos",
+  "Servicios de casa",
+  "Compras en línea",
+  "Aseo"
+];
+
+const categoryIcons = {
+  "Comida rápida": "🍔",
+  "Supermercado": "🛒",
+  "Carnicería": "🥩",
+  "Farmacia": "💊",
+  "Veterinaria": "🐾",
+  "Servicios públicos": "💡",
+  "Mantenimiento vehículo": "🔧",
+  "Bancos": "🏦",
+  "Servicios de casa": "🏠",
+  "Compras en línea": "📦",
+  "Aseo": "🧹",
+  "Sin categoría": "📌"
+};
+
 let selectedType = "income";
 let movements = [];
 let pendingDeleteId = null;
 let editingMovementId = null;
+let selectedMonthKey = null;
+let selectedCategory = null;
 
 const currentBalanceEl = document.querySelector("#currentBalance");
 const cardBalanceEl = document.querySelector("#cardBalance");
-const movementCountEl = document.querySelector("#movementCount");
-const historyListEl = document.querySelector("#historyList");
 const movementForm = document.querySelector("#movementForm");
 const amountInput = document.querySelector("#amount");
 const descriptionInput = document.querySelector("#description");
+const categoryInput = document.querySelector("#category");
+const categoryField = document.querySelector("#categoryField");
 const dateInput = document.querySelector("#date");
 const saveButton = document.querySelector("#saveButton");
 const formMessage = document.querySelector("#formMessage");
@@ -49,6 +80,24 @@ const connectionStatus = document.querySelector("#connectionStatus");
 const confirmDialog = document.querySelector("#confirmDialog");
 const confirmDeleteButton = document.querySelector("#confirmDeleteButton");
 const cancelEditButton = document.querySelector("#cancelEditButton");
+const categorySummary = document.querySelector("#categorySummary");
+const categoryPeriod = document.querySelector("#categoryPeriod");
+const monthGroups = document.querySelector("#monthGroups");
+const monthDetailTitle = document.querySelector("#monthDetailTitle");
+const monthDetailSubtitle = document.querySelector("#monthDetailSubtitle");
+const monthDetailList = document.querySelector("#monthDetailList");
+const categoryDetailTitle = document.querySelector("#categoryDetailTitle");
+const categoryDetailSubtitle = document.querySelector("#categoryDetailSubtitle");
+const categoryDetailList = document.querySelector("#categoryDetailList");
+const navHome = document.querySelector("#navHome");
+const navHistory = document.querySelector("#navHistory");
+
+const views = {
+  home: document.querySelector("#viewHome"),
+  history: document.querySelector("#viewHistory"),
+  month: document.querySelector("#viewMonth"),
+  category: document.querySelector("#viewCategory")
+};
 
 function todayAsLocalISO() {
   const now = new Date();
@@ -67,7 +116,7 @@ function formatCurrency(value) {
 }
 
 function parseAmount(rawValue) {
-  const digits = rawValue.replace(/[^0-9]/g, "");
+  const digits = String(rawValue).replace(/[^0-9]/g, "");
   return digits ? Number(digits) : 0;
 }
 
@@ -90,13 +139,10 @@ function calculateBalances(items) {
           totals.current -= amount;
           break;
         case "card_purchase":
-          // El gasto a crédito reduce el saldo real disponible y aumenta la deuda.
           totals.current -= amount;
           totals.card += amount;
           break;
         case "card_payment":
-          // La compra a crédito ya fue descontada del saldo real.
-          // Pagar la tarjeta solo reduce la deuda para no contar el gasto dos veces.
           totals.card -= amount;
           break;
       }
@@ -125,50 +171,131 @@ function formatDate(dateString) {
   }).format(new Date(year, month - 1, day));
 }
 
+function monthKey(dateString) {
+  return dateString ? dateString.slice(0, 7) : "sin-fecha";
+}
+
+function monthLabel(key) {
+  if (!key || key === "sin-fecha") return "Sin fecha";
+  const [year, month] = key.split("-").map(Number);
+  const text = new Intl.DateTimeFormat("es-CR", {
+    month: "long",
+    year: "numeric"
+  }).format(new Date(year, month - 1, 1));
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function currentMonthKey() {
+  return todayAsLocalISO().slice(0, 7);
+}
+
 function movementVisual(type) {
   switch (type) {
     case "income": return { symbol: "↓", className: "", amountClass: "positive", sign: "+" };
     case "expense": return { symbol: "↑", className: "negative", amountClass: "negative", sign: "−" };
-    case "card_purchase": return { symbol: "💳", className: "card", amountClass: "negative", sign: "+" };
+    case "card_purchase": return { symbol: "💳", className: "card", amountClass: "negative", sign: "−" };
     case "card_payment": return { symbol: "✓", className: "card negative", amountClass: "negative", sign: "−" };
     default: return { symbol: "•", className: "", amountClass: "", sign: "" };
   }
 }
 
-function render() {
-  const totals = calculateBalances(movements);
-  currentBalanceEl.textContent = formatCurrency(totals.current);
-  cardBalanceEl.textContent = formatCurrency(Math.max(0, totals.card));
-  movementCountEl.textContent = String(movements.length);
+function isSpendingMovement(movement) {
+  return movement.type === "expense" || movement.type === "card_purchase";
+}
 
-  if (!movements.length) {
-    historyListEl.innerHTML = '<p class="empty-state">Todavía no hay movimientos.</p>';
+function normalizeText(value) {
+  return String(value || "")
+    .toLocaleLowerCase("es")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function inferCategory(description) {
+  const text = normalizeText(description);
+
+  if (/(mcdonald|burger|pizza|restaurante|restauran|soda |cafeter|cafe |comida rapida|starbucks)/.test(text)) return "Comida rápida";
+  if (/(supermerc|walmart|pali|maxi pali|mas x menos|automercado|pricesmart|diario)/.test(text)) return "Supermercado";
+  if (/(carnicer|carne|pollo|marisco|pescader)/.test(text)) return "Carnicería";
+  if (/(farmacia|fischel|bomba)/.test(text)) return "Farmacia";
+  if (/(veterin|mascota|pet )/.test(text)) return "Veterinaria";
+  if (/(electricidad|recibo luz|luz |acueduct|agua |aya|ice electricidad)/.test(text)) return "Servicios públicos";
+  if (/(mecanic|vehicul|carro|aceite|llanta|repuesto|taller|mantenimiento auto)/.test(text)) return "Mantenimiento vehículo";
+  if (/(banco|prestamo|credito|bac|bcr|coopenae|conape|cuota|financ)/.test(text)) return "Bancos";
+  if (/(internet|cable|kolbi|liberty|telecable|limpieza casa|servicio casa)/.test(text)) return "Servicios de casa";
+  if (/(amazon|temu|shein|aliexpress|compra en linea|compra online)/.test(text)) return "Compras en línea";
+  if (/(aseo|limpieza|detergente|jabon|cloro)/.test(text)) return "Aseo";
+
+  return "Sin categoría";
+}
+
+function movementCategory(movement) {
+  if (!isSpendingMovement(movement)) return "";
+  return movement.category || inferCategory(movement.description);
+}
+
+function needsCategory(type) {
+  return type === "expense" || type === "card_purchase";
+}
+
+function updateCategoryField() {
+  const required = needsCategory(selectedType);
+  categoryField.hidden = !required;
+  categoryInput.required = required;
+  if (!required) categoryInput.value = "";
+}
+
+function showView(name) {
+  Object.entries(views).forEach(([key, element]) => {
+    element.hidden = key !== name;
+  });
+
+  navHome.classList.toggle("active", name === "home" || name === "category");
+  navHistory.classList.toggle("active", name === "history" || name === "month");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderMovementList(target, items) {
+  if (!items.length) {
+    target.innerHTML = '<p class="empty-state">No hay movimientos.</p>';
     return;
   }
 
-  historyListEl.innerHTML = "";
-  for (const movement of sortedMovements(movements)) {
+  target.innerHTML = "";
+
+  for (const movement of sortedMovements(items)) {
     const visual = movementVisual(movement.type);
     const item = document.createElement("article");
     item.className = `history-item ${visual.className}`.trim();
 
     const icon = document.createElement("div");
     icon.className = "history-icon";
-    icon.textContent = visual.symbol;
+    icon.textContent = isSpendingMovement(movement)
+      ? (categoryIcons[movementCategory(movement)] || visual.symbol)
+      : visual.symbol;
 
     const info = document.createElement("div");
     const description = document.createElement("p");
     description.className = "history-description";
     description.textContent = movement.description;
+
     const meta = document.createElement("p");
     meta.className = "history-meta";
     meta.textContent = `${typeLabels[movement.type] ?? "Movimiento"} · ${formatDate(movement.date)}`;
     info.append(description, meta);
 
+    if (isSpendingMovement(movement)) {
+      const cat = document.createElement("span");
+      cat.className = "detail-category";
+      cat.textContent = movementCategory(movement);
+      info.append(cat);
+    }
+
     const amountBox = document.createElement("div");
     const amount = document.createElement("div");
     amount.className = `history-amount ${visual.amountClass}`.trim();
     amount.textContent = `${visual.sign}${formatCurrency(Number(movement.amount) || 0)}`;
+
     const actions = document.createElement("div");
     actions.style.cssText = "display:flex;justify-content:flex-end;gap:10px;margin-top:4px;";
 
@@ -189,8 +316,126 @@ function render() {
     amountBox.append(amount, actions);
 
     item.append(icon, info, amountBox);
-    historyListEl.append(item);
+    target.append(item);
   }
+}
+
+function renderCategorySummary() {
+  const key = currentMonthKey();
+  categoryPeriod.textContent = monthLabel(key);
+
+  const monthSpending = movements.filter(
+    movement => isSpendingMovement(movement) && monthKey(movement.date) === key
+  );
+
+  const groups = new Map();
+
+  for (const movement of monthSpending) {
+    const category = movementCategory(movement);
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(movement);
+  }
+
+  const ordered = [
+    ...categories.filter(category => groups.has(category)),
+    ...(groups.has("Sin categoría") ? ["Sin categoría"] : [])
+  ];
+
+  if (!ordered.length) {
+    categorySummary.innerHTML = '<p class="empty-state">Todavía no hay gastos este mes.</p>';
+    return;
+  }
+
+  categorySummary.innerHTML = ordered.map(category => {
+    const items = groups.get(category);
+    const total = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    return `
+      <button type="button" class="category-row" data-category="${escapeHTML(category)}">
+        <span class="category-icon">${categoryIcons[category] || "📌"}</span>
+        <span class="category-main">
+          <strong>${escapeHTML(category)}</strong>
+          <small>${items.length} ${items.length === 1 ? "movimiento" : "movimientos"}</small>
+        </span>
+        <span class="category-total">−${formatCurrency(total)}</span>
+        <span class="row-chevron">›</span>
+      </button>
+    `;
+  }).join("");
+}
+
+function renderHistoryMonths() {
+  const groups = new Map();
+
+  for (const movement of movements) {
+    const key = monthKey(movement.date);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(movement);
+  }
+
+  const keys = [...groups.keys()].sort().reverse();
+
+  if (!keys.length) {
+    monthGroups.innerHTML = '<p class="empty-state">Todavía no hay movimientos.</p>';
+    return;
+  }
+
+  monthGroups.innerHTML = keys.map(key => {
+    const items = groups.get(key);
+    const spending = items
+      .filter(isSpendingMovement)
+      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+    return `
+      <button type="button" class="month-row" data-month="${escapeHTML(key)}">
+        <span class="month-icon">📅</span>
+        <span class="month-main">
+          <strong>${escapeHTML(monthLabel(key))}</strong>
+          <small>${items.length} ${items.length === 1 ? "movimiento" : "movimientos"}</small>
+        </span>
+        <span class="month-total">${spending ? `−${formatCurrency(spending)}` : formatCurrency(0)}</span>
+        <span class="row-chevron">›</span>
+      </button>
+    `;
+  }).join("");
+}
+
+function renderMonthDetail() {
+  if (!selectedMonthKey) return;
+
+  const items = movements.filter(movement => monthKey(movement.date) === selectedMonthKey);
+  monthDetailTitle.textContent = monthLabel(selectedMonthKey);
+  monthDetailSubtitle.textContent = `${items.length} ${items.length === 1 ? "movimiento" : "movimientos"}`;
+  renderMovementList(monthDetailList, items);
+}
+
+function renderCategoryDetail() {
+  if (!selectedCategory) return;
+
+  const key = currentMonthKey();
+  const items = movements.filter(
+    movement =>
+      isSpendingMovement(movement) &&
+      monthKey(movement.date) === key &&
+      movementCategory(movement) === selectedCategory
+  );
+
+  const total = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  categoryDetailTitle.textContent = `${categoryIcons[selectedCategory] || "📌"} ${selectedCategory}`;
+  categoryDetailSubtitle.textContent =
+    `${monthLabel(key)} · ${items.length} ${items.length === 1 ? "movimiento" : "movimientos"} · ${formatCurrency(total)}`;
+
+  renderMovementList(categoryDetailList, items);
+}
+
+function render() {
+  const totals = calculateBalances(movements);
+  currentBalanceEl.textContent = formatCurrency(totals.current);
+  cardBalanceEl.textContent = formatCurrency(Math.max(0, totals.card));
+
+  renderCategorySummary();
+  renderHistoryMonths();
+  renderMonthDetail();
+  renderCategoryDetail();
 }
 
 function showMessage(message, kind = "") {
@@ -205,16 +450,16 @@ function setSaving(isSaving) {
     : (editingMovementId ? "Guardar cambios" : "Guardar movimiento");
 }
 
-
 function selectMovementType(type) {
   selectedType = type;
-  document.querySelectorAll(".type-button").forEach((button) => {
+  document.querySelectorAll(".type-button").forEach(button => {
     button.classList.toggle("active", button.dataset.type === type);
   });
+  updateCategoryField();
 }
 
 function startEditing(movementId) {
-  const movement = movements.find((item) => item.id === movementId);
+  const movement = movements.find(item => item.id === movementId);
   if (!movement) return;
 
   editingMovementId = movement.id;
@@ -222,9 +467,16 @@ function startEditing(movementId) {
   amountInput.value = new Intl.NumberFormat("es-CR").format(Number(movement.amount) || 0);
   descriptionInput.value = movement.description;
   dateInput.value = movement.date;
+
+  if (needsCategory(movement.type)) {
+    categoryInput.value = movement.category || movementCategory(movement);
+    if (categoryInput.value === "Sin categoría") categoryInput.value = "";
+  }
+
   saveButton.textContent = "Guardar cambios";
   cancelEditButton.hidden = false;
   showMessage("Editando movimiento.", "success");
+  showView("home");
   movementForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -234,26 +486,35 @@ function cancelEditing() {
   selectMovementType("income");
   dateInput.value = todayAsLocalISO();
   amountInput.value = "";
+  categoryInput.value = "";
   saveButton.textContent = "Guardar movimiento";
   cancelEditButton.hidden = true;
   showMessage("");
 }
 
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 cancelEditButton.addEventListener("click", cancelEditing);
 
 for (const button of document.querySelectorAll(".type-button")) {
-  button.addEventListener("click", () => {
-    selectMovementType(button.dataset.type);
-  });
+  button.addEventListener("click", () => selectMovementType(button.dataset.type));
 }
 
-movementForm.addEventListener("submit", async (event) => {
+movementForm.addEventListener("submit", async event => {
   event.preventDefault();
   showMessage("");
 
   const amount = parseAmount(amountInput.value);
   const description = descriptionInput.value.trim();
   const date = dateInput.value;
+  const category = needsCategory(selectedType) ? categoryInput.value : "";
 
   if (!amount || amount <= 0) {
     showMessage("Escribe un monto válido.", "error");
@@ -267,6 +528,12 @@ movementForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  if (needsCategory(selectedType) && !category) {
+    showMessage("Selecciona una categoría.", "error");
+    categoryInput.focus();
+    return;
+  }
+
   if (!date) {
     showMessage("Selecciona una fecha.", "error");
     dateInput.focus();
@@ -274,23 +541,24 @@ movementForm.addEventListener("submit", async (event) => {
   }
 
   setSaving(true);
+
   try {
+    const data = {
+      type: selectedType,
+      amount,
+      description,
+      category,
+      date
+    };
+
     if (editingMovementId) {
-      await updateDoc(doc(db, "movimientos", editingMovementId), {
-        type: selectedType,
-        amount,
-        description,
-        date
-      });
+      await updateDoc(doc(db, "movimientos", editingMovementId), data);
       editingMovementId = null;
       cancelEditButton.hidden = true;
       showMessage("Movimiento actualizado correctamente.", "success");
     } else {
       await addDoc(movementsRef, {
-        type: selectedType,
-        amount,
-        description,
-        date,
+        ...data,
         createdAt: serverTimestamp()
       });
       showMessage("Movimiento guardado.", "success");
@@ -300,16 +568,18 @@ movementForm.addEventListener("submit", async (event) => {
     selectMovementType("income");
     dateInput.value = todayAsLocalISO();
     amountInput.value = "";
+    categoryInput.value = "";
     saveButton.textContent = "Guardar movimiento";
   } catch (error) {
     console.error(error);
-    showMessage("No se pudo guardar. Revisa la conexión o las reglas de Firebase.", "error");
+    const detail = error?.code ? ` (${error.code})` : "";
+    showMessage(`No se pudo guardar${detail}. Revisa la conexión o las reglas de Firebase.`, "error");
   } finally {
     setSaving(false);
   }
 });
 
-historyListEl.addEventListener("click", (event) => {
+function handleMovementActions(event) {
   const editButton = event.target.closest(".edit-button");
   if (editButton) {
     startEditing(editButton.dataset.id);
@@ -318,8 +588,35 @@ historyListEl.addEventListener("click", (event) => {
 
   const deleteButton = event.target.closest(".delete-button");
   if (!deleteButton) return;
+
   pendingDeleteId = deleteButton.dataset.id;
   confirmDialog.showModal();
+}
+
+monthDetailList.addEventListener("click", handleMovementActions);
+categoryDetailList.addEventListener("click", handleMovementActions);
+
+categorySummary.addEventListener("click", event => {
+  const row = event.target.closest("[data-category]");
+  if (!row) return;
+  selectedCategory = row.dataset.category;
+  renderCategoryDetail();
+  showView("category");
+});
+
+monthGroups.addEventListener("click", event => {
+  const row = event.target.closest("[data-month]");
+  if (!row) return;
+  selectedMonthKey = row.dataset.month;
+  renderMonthDetail();
+  showView("month");
+});
+
+document.querySelectorAll("[data-go]").forEach(button => {
+  button.addEventListener("click", () => {
+    const destination = button.dataset.go;
+    showView(destination);
+  });
 });
 
 confirmDialog.addEventListener("close", async () => {
@@ -329,6 +626,7 @@ confirmDialog.addEventListener("close", async () => {
   }
 
   confirmDeleteButton.disabled = true;
+
   try {
     await deleteDoc(doc(db, "movimientos", pendingDeleteId));
   } catch (error) {
@@ -342,13 +640,13 @@ confirmDialog.addEventListener("close", async () => {
 
 onSnapshot(
   movementsRef,
-  (snapshot) => {
-    movements = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+  snapshot => {
+    movements = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
     connectionStatus.textContent = "Sincronizado";
     connectionStatus.className = "status-pill online";
     render();
   },
-  (error) => {
+  error => {
     console.error(error);
     connectionStatus.textContent = "Sin acceso";
     connectionStatus.className = "status-pill offline";
@@ -360,11 +658,14 @@ window.addEventListener("online", () => {
   connectionStatus.textContent = "Conectando…";
   connectionStatus.className = "status-pill";
 });
+
 window.addEventListener("offline", () => {
   connectionStatus.textContent = "Sin internet";
   connectionStatus.className = "status-pill offline";
 });
 
+selectMovementType("income");
+showView("home");
 
 // Sistema de actualización de la aplicación.
 function showAppUpdate(worker) {
@@ -373,8 +674,10 @@ function showAppUpdate(worker) {
   if (!banner) {
     banner = document.createElement("div");
     banner.id = "appUpdateBanner";
-    banner.style.cssText = "position:fixed;left:12px;right:12px;bottom:18px;z-index:9999;max-width:520px;margin:auto;padding:14px 15px;border-radius:16px;background:#fff;color:#17212b;box-shadow:0 12px 35px rgba(0,0,0,.22);border:1px solid #dfe7e3;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;";
-    banner.innerHTML = '<div style="display:flex;align-items:center;gap:12px"><div style="flex:1"><strong style="display:block;font-size:15px">Nueva versión disponible</strong><span style="display:block;margin-top:2px;font-size:13px;color:#64706b">Hay mejoras listas para instalar.</span></div><button id="appUpdateButton" type="button" style="border:0;border-radius:11px;padding:10px 14px;background:#16855b;color:#fff;font-weight:700">Actualizar</button></div>';
+    banner.style.cssText =
+      "position:fixed;left:12px;right:12px;bottom:78px;z-index:9999;max-width:520px;margin:auto;padding:14px 15px;border-radius:16px;background:#fff;color:#17212b;box-shadow:0 12px 35px rgba(0,0,0,.22);border:1px solid #dfe7e3;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;";
+    banner.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px"><div style="flex:1"><strong style="display:block;font-size:15px">Nueva versión disponible</strong><span style="display:block;margin-top:2px;font-size:13px;color:#64706b">Hay mejoras listas para instalar.</span></div><button id="appUpdateButton" type="button" style="border:0;border-radius:11px;padding:10px 14px;background:#16855b;color:#fff;font-weight:700">Actualizar</button></div>';
     document.body.appendChild(banner);
   }
 
@@ -417,6 +720,7 @@ if ("serviceWorker" in navigator) {
       });
 
       await registration.update();
+
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
           registration.update().catch(() => {});
@@ -427,4 +731,3 @@ if ("serviceWorker" in navigator) {
     }
   });
 }
-
