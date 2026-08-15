@@ -41,7 +41,8 @@ const categories = [
   "Bancos",
   "Servicios de casa",
   "Compras en línea",
-  "Aseo"
+  "Aseo",
+  "Ocio y entretenimiento"
 ];
 
 const categoryIcons = {
@@ -56,6 +57,7 @@ const categoryIcons = {
   "Servicios de casa": "🏠",
   "Compras en línea": "📦",
   "Aseo": "🧹",
+  "Ocio y entretenimiento": "🎬",
   "Sin categoría": "📌"
 };
 
@@ -224,6 +226,7 @@ function inferCategory(description) {
   if (/(internet|cable|kolbi|liberty|telecable|limpieza casa|servicio casa)/.test(text)) return "Servicios de casa";
   if (/(amazon|temu|shein|aliexpress|compra en linea|compra online)/.test(text)) return "Compras en línea";
   if (/(aseo|limpieza|detergente|jabon|cloro)/.test(text)) return "Aseo";
+  if (/(cine|cinema|pelicula|paseo|parque de diversiones|entrada|entretenimiento)/.test(text)) return "Ocio y entretenimiento";
 
   return "Sin categoría";
 }
