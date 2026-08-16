@@ -130,33 +130,37 @@ function formatAmountInput() {
 amountInput.addEventListener("input", formatAmountInput);
 
 function calculateBalances(items) {
-  return items.reduce(
-    (totals, movement) => {
-      const amount = Number(movement.amount) || 0;
+  let income = 0;
+  let debitExpenses = 0;
+  let creditPurchases = 0;
+  let cardPayments = 0;
 
-      switch (movement.type) {
-        case "income":
-          totals.current += amount;
-          break;
+  for (const movement of items) {
+    const amount = Number(movement.amount) || 0;
 
-        case "expense":
-          totals.current -= amount;
-          break;
+    switch (movement.type) {
+      case "income":
+        income += amount;
+        break;
+      case "expense":
+        debitExpenses += amount;
+        break;
+      case "card_purchase":
+        creditPurchases += amount;
+        break;
+      case "card_payment":
+        cardPayments += amount;
+        break;
+    }
+  }
 
-        case "card_purchase":
-          totals.current -= amount;
-          totals.card += amount;
-          break;
+  // Saldo real: el pago de la tarjeta NO altera este resultado.
+  const current = income - debitExpenses - creditPurchases;
 
-        case "card_payment":
-          totals.card -= amount;
-          break;
-      }
+  // Total crédito: conserva saldos pendientes y suma nuevas compras.
+  const card = Math.max(0, creditPurchases - cardPayments);
 
-      return totals;
-    },
-    { current: 0, card: 0 }
-  );
+  return { current, card };
 }
 
 function movementTimestamp(movement) {
