@@ -1,10 +1,10 @@
-const CACHE_NAME = "finanzas-compartidas-v16-forzado";
+const CACHE_NAME = "finanzas-compartidas-v17";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./categories-v12.css",
-  "./app-v16.js",
+  "./app-v17.js",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png"
@@ -42,7 +42,7 @@ self.addEventListener("fetch", event => {
   if (
     event.request.mode === "navigate" ||
     url.pathname.endsWith("/index.html") ||
-    url.pathname.endsWith("/app-v16.js") ||
+    url.pathname.endsWith("/app-v17.js") ||
     url.pathname.endsWith("/styles.css") ||
     url.pathname.endsWith("/categories-v12.css") ||
     url.pathname.endsWith("/manifest.webmanifest")
