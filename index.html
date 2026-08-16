@@ -6,11 +6,11 @@
   <meta name="theme-color" content="#14833b">
   <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=13">
+  <link rel="manifest" href="./manifest.webmanifest?v=14">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=13">
-  <link rel="stylesheet" href="./categories-v12.css?v=13">
+  <link rel="stylesheet" href="./styles.css?v=14">
+  <link rel="stylesheet" href="./categories-v12.css?v=14">
 </head>
 <body>
   <main class="app-shell">
@@ -23,9 +23,9 @@
     </header>
 
     <section id="viewHome" class="app-view">
-      <section class="balance-card balance-main" aria-label="Saldo actual">
+      <section class="balance-card balance-main" aria-label="Saldo real">
         <div>
-          <p>Saldo actual</p>
+          <p>Saldo real</p>
           <strong id="currentBalance">₡0</strong>
         </div>
         <div class="balance-icon" aria-hidden="true">💰</div>
@@ -33,7 +33,7 @@
 
       <section class="balance-card balance-card-credit" aria-label="Saldo de tarjeta de crédito">
         <div>
-          <p>Tarjeta de crédito</p>
+          <p>Total crédito</p>
           <strong id="cardBalance">₡0</strong>
         </div>
         <div class="balance-icon" aria-hidden="true">💳</div>
@@ -173,6 +173,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=13"></script>
+  <script type="module" src="./app.js?v=14"></script>
 </body>
 </html>

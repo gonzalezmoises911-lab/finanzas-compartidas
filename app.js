@@ -133,21 +133,26 @@ function calculateBalances(items) {
   return items.reduce(
     (totals, movement) => {
       const amount = Number(movement.amount) || 0;
+
       switch (movement.type) {
         case "income":
           totals.current += amount;
           break;
+
         case "expense":
           totals.current -= amount;
           break;
+
         case "card_purchase":
           totals.current -= amount;
           totals.card += amount;
           break;
+
         case "card_payment":
           totals.card -= amount;
           break;
       }
+
       return totals;
     },
     { current: 0, card: 0 }
