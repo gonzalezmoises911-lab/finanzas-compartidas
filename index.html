@@ -3,186 +3,131 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#16855b">
-  <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
+  <meta name="theme-color" content="#123c31">
+  <meta name="description" content="Finanzas compartidas: saldo, tarjeta, categorías e histórico.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=19">
+  <link rel="manifest" href="./manifest.webmanifest?v=20">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=19">
-  <link rel="stylesheet" href="./categories-v12.css?v=19">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=20">
 </head>
-<body>
+<body data-page="home">
   <main class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Control compartido</p>
+        <p class="eyebrow">CONTROL COMPARTIDO</p>
         <h1>Finanzas</h1>
-        <p class="hero-subtitle">Más claro, más bonito y más fácil de usar.</p>
       </div>
       <div id="connectionStatus" class="status-pill" aria-live="polite">Conectando…</div>
     </header>
 
-    <section id="viewHome" class="app-view">
-      <section class="balance-card balance-main" aria-label="Saldo real">
-        <div>
-          <p>Saldo real</p>
+    <section class="balance-grid" aria-label="Resumen financiero">
+      <article class="balance-card cash-card">
+        <div class="balance-copy">
+          <span>Saldo real</span>
           <strong id="currentBalance">₡0</strong>
-          <small>Ingresos menos gastos y compras de crédito</small>
         </div>
-        <div class="balance-icon" aria-hidden="true">💰</div>
-      </section>
+        <div class="money-stack" aria-hidden="true">
+          <i></i><i></i><b>₡</b>
+        </div>
+      </article>
 
-      <section class="balance-card balance-card-credit" aria-label="Saldo de tarjeta de crédito">
-        <div>
-          <p>Total crédito</p>
+      <article class="balance-card credit-card">
+        <div class="balance-copy">
+          <span>Total crédito</span>
           <strong id="cardBalance">₡0</strong>
-          <small>Lo pendiente por pagar en la tarjeta</small>
         </div>
-        <div class="balance-icon" aria-hidden="true">💳</div>
-      </section>
+        <div class="bac-icon" aria-label="BAC">
+          <span class="bac-mark">▰▰▰</span>
+          <strong>BAC</strong>
+        </div>
+      </article>
+    </section>
 
-      <section class="panel">
-        <div class="section-heading">
-          <div>
-            <h2>Registrar movimiento</h2>
-            <p class="section-subtitle">Guarda ingresos, gastos y pagos de forma rápida.</p>
+    <section class="panel movement-panel">
+      <div class="panel-heading">
+        <h2>Registrar movimiento</h2>
+      </div>
+
+      <div class="movement-types" role="group" aria-label="Tipo de movimiento">
+        <button type="button" class="type-button active" data-type="income">Ingreso</button>
+        <button type="button" class="type-button" data-type="expense">Gasto débito</button>
+        <button type="button" class="type-button" data-type="card_purchase">Gasto crédito</button>
+        <button type="button" class="type-button" data-type="card_payment">Pago tarjeta</button>
+      </div>
+
+      <form id="movementForm" novalidate>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="amount">Monto</label>
+            <div class="input-with-prefix">
+              <span>₡</span>
+              <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="date">Fecha</label>
+            <input id="date" name="date" type="date" required>
           </div>
         </div>
 
-        <div class="movement-types" role="group" aria-label="Tipo de movimiento">
-          <button type="button" class="type-button active" data-type="income">Ingreso</button>
-          <button type="button" class="type-button" data-type="expense">Gasto débito</button>
-          <button type="button" class="type-button" data-type="card_purchase">Gasto crédito</button>
-          <button type="button" class="type-button" data-type="card_payment">Pago de tarjeta</button>
-        </div>
-
-        <p id="movementHint" class="movement-hint">Los ingresos aumentan el saldo real.</p>
-
-        <form id="movementForm" novalidate>
-          <label for="amount">Monto</label>
-          <div class="input-with-prefix">
-            <span>₡</span>
-            <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
-          </div>
-
+        <div class="field-group">
           <label for="description">Descripción</label>
-          <input
-            id="description"
-            name="description"
-            type="text"
-            maxlength="100"
-            placeholder="Ej. Walmart, Carnicería Ticol, Amazon…"
-            required
-          >
-
-          <div id="categoryField" class="category-field" hidden>
-            <label for="category">Categoría</label>
-            <select id="category" name="category">
-              <option value="">Seleccionar categoría…</option>
-              <option value="Comida rápida">🍔 Comida rápida</option>
-              <option value="Supermercado">🛒 Supermercado</option>
-              <option value="Carnicería">🥩 Carnicería</option>
-              <option value="Farmacia">💊 Farmacia</option>
-              <option value="Veterinaria">🐾 Veterinaria</option>
-              <option value="Servicios públicos">💡 Servicios públicos</option>
-              <option value="Mantenimiento vehículo">🔧 Mantenimiento vehículo</option>
-              <option value="Bancos">🏦 Bancos</option>
-              <option value="Servicios de casa">🏠 Servicios de casa</option>
-              <option value="Compras en línea">📦 Compras en línea</option>
-              <option value="Aseo">🧹 Aseo</option>
-              <option value="Ocio y entretenimiento">🎬 Ocio y entretenimiento</option>
-            </select>
-          </div>
-
-          <label for="date">Fecha</label>
-          <input id="date" name="date" type="date" required>
-
-          <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
-          <button id="cancelEditButton" type="button" hidden class="cancel-edit-button">
-            Cancelar edición
-          </button>
-          <p id="formMessage" class="form-message" aria-live="polite"></p>
-        </form>
-      </section>
-
-      <section class="panel category-panel">
-        <div class="section-heading category-heading">
-          <div>
-            <h2>Gastos por categoría</h2>
-            <p id="categoryPeriod" class="section-subtitle"></p>
-          </div>
+          <input id="description" name="description" type="text" maxlength="100" placeholder="Ej. Supermercado, gasolina, Amazon…" required>
         </div>
-        <div id="categorySummary" class="category-summary">
-          <p class="empty-state">Todavía no hay gastos este mes.</p>
+
+        <div id="categoryField" class="field-group" hidden>
+          <label for="category">Categoría</label>
+          <select id="category" name="category">
+            <option value="">Seleccionar categoría…</option>
+            <option value="Comida rápida">🍔 Comida rápida</option>
+            <option value="Supermercado">🛒 Supermercado</option>
+            <option value="Carnicería">🥩 Carnicería</option>
+            <option value="Farmacia">💊 Farmacia</option>
+            <option value="Veterinaria">🐾 Veterinaria</option>
+            <option value="Servicios públicos">💡 Servicios públicos</option>
+            <option value="Mantenimiento vehículo">🔧 Mantenimiento vehículo</option>
+            <option value="Bancos">🏦 Bancos</option>
+            <option value="Servicios de casa">🏠 Servicios de casa</option>
+            <option value="Compras en línea">📦 Compras en línea</option>
+            <option value="Aseo">🧹 Aseo</option>
+            <option value="Ocio y entretenimiento">🎬 Ocio y entretenimiento</option>
+          </select>
         </div>
-      </section>
+
+        <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
+        <button id="cancelEditButton" type="button" hidden class="secondary-button">Cancelar edición</button>
+        <p id="formMessage" class="form-message" aria-live="polite"></p>
+      </form>
     </section>
 
-    <section id="viewHistory" class="app-view" hidden>
-      <div class="page-heading">
-        <button class="back-button" data-go="home" type="button" aria-label="Volver">←</button>
+    <section class="panel summary-panel">
+      <div class="panel-heading split-heading">
         <div>
-          <h2>Histórico</h2>
-          <p>Movimientos agrupados por mes y año.</p>
+          <p class="section-kicker">RESUMEN DEL MES</p>
+          <h2>Acumulado por categoría</h2>
         </div>
+        <span id="categoryPeriod" class="month-chip"></span>
       </div>
-      <section class="panel">
-        <div id="monthGroups" class="month-groups">
-          <p class="empty-state">Todavía no hay movimientos.</p>
-        </div>
-      </section>
+      <div id="categorySummary" class="category-summary">
+        <p class="empty-state">Todavía no hay gastos este mes.</p>
+      </div>
     </section>
 
-    <section id="viewMonth" class="app-view" hidden>
-      <div class="page-heading">
-        <button class="back-button" data-go="history" type="button" aria-label="Volver">←</button>
-        <div>
-          <h2 id="monthDetailTitle">Mes</h2>
-          <p id="monthDetailSubtitle"></p>
-        </div>
-      </div>
-      <section class="panel">
-        <div id="monthDetailList" class="history-list"></div>
-      </section>
-    </section>
-
-    <section id="viewCategory" class="app-view" hidden>
-      <div class="page-heading">
-        <button class="back-button" data-go="home" type="button" aria-label="Volver">←</button>
-        <div>
-          <h2 id="categoryDetailTitle">Categoría</h2>
-          <p id="categoryDetailSubtitle"></p>
-        </div>
-      </div>
-      <section class="panel">
-        <div id="categoryDetailList" class="history-list"></div>
-      </section>
-    </section>
+    <a class="history-entry" href="./history.html" aria-label="Abrir histórico general">
+      <span class="history-entry-icon">↗</span>
+      <span class="history-entry-copy">
+        <small>VER TODO</small>
+        <strong>Histórico general</strong>
+      </span>
+      <span class="history-entry-arrow">›</span>
+    </a>
   </main>
 
-  <nav class="bottom-nav" aria-label="Navegación principal">
-    <button id="navHome" class="bottom-nav-button active" type="button" data-go="home">
-      <span>⌂</span>
-      <small>Inicio</small>
-    </button>
-    <button id="navHistory" class="bottom-nav-button" type="button" data-go="history">
-      <span>◷</span>
-      <small>Histórico</small>
-    </button>
-  </nav>
-
-  <dialog id="confirmDialog">
-    <form method="dialog" class="dialog-card">
-      <h2>Eliminar movimiento</h2>
-      <p>Esta acción actualizará los saldos y no se puede deshacer.</p>
-      <div class="dialog-actions">
-        <button value="cancel" class="secondary-button">Cancelar</button>
-        <button id="confirmDeleteButton" value="confirm" class="danger-button">Eliminar</button>
-      </div>
-    </form>
-  </dialog>
-
-  <script type="module" src="./app-v19.js"></script>
+  <script type="module" src="./app-v20.js"></script>
 </body>
 </html>

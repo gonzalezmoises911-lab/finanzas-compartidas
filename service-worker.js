@@ -1,10 +1,11 @@
-const CACHE_NAME = "finanzas-compartidas-v19";
+const CACHE_NAME = "finanzas-compartidas-v20";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./history.html",
+  "./category.html",
   "./styles.css",
-  "./categories-v12.css",
-  "./app-v19.js",
+  "./app-v20.js",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png"
@@ -27,25 +28,24 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("message", event => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
-
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (
+  const coreFile =
     event.request.mode === "navigate" ||
     url.pathname.endsWith("/index.html") ||
-    url.pathname.endsWith("/app-v19.js") ||
+    url.pathname.endsWith("/history.html") ||
+    url.pathname.endsWith("/category.html") ||
+    url.pathname.endsWith("/app-v20.js") ||
     url.pathname.endsWith("/styles.css") ||
-    url.pathname.endsWith("/categories-v12.css") ||
-    url.pathname.endsWith("/manifest.webmanifest")
-  ) {
+    url.pathname.endsWith("/manifest.webmanifest");
+
+  if (coreFile) {
     event.respondWith(
       fetch(event.request, { cache: "no-store" })
         .then(response => {
