@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#14833b">
+  <meta name="theme-color" content="#16855b">
   <meta name="description" content="Aplicación sencilla para controlar ingresos, gastos y tarjeta de crédito.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=17">
+  <link rel="manifest" href="./manifest.webmanifest?v=19">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=17">
-  <link rel="stylesheet" href="./categories-v12.css?v=17">
+  <link rel="stylesheet" href="./styles.css?v=19">
+  <link rel="stylesheet" href="./categories-v12.css?v=19">
 </head>
 <body>
   <main class="app-shell">
@@ -18,6 +18,7 @@
       <div>
         <p class="eyebrow">Control compartido</p>
         <h1>Finanzas</h1>
+        <p class="hero-subtitle">Más claro, más bonito y más fácil de usar.</p>
       </div>
       <div id="connectionStatus" class="status-pill" aria-live="polite">Conectando…</div>
     </header>
@@ -27,6 +28,7 @@
         <div>
           <p>Saldo real</p>
           <strong id="currentBalance">₡0</strong>
+          <small>Ingresos menos gastos y compras de crédito</small>
         </div>
         <div class="balance-icon" aria-hidden="true">💰</div>
       </section>
@@ -35,12 +37,18 @@
         <div>
           <p>Total crédito</p>
           <strong id="cardBalance">₡0</strong>
+          <small>Lo pendiente por pagar en la tarjeta</small>
         </div>
         <div class="balance-icon" aria-hidden="true">💳</div>
       </section>
 
       <section class="panel">
-        <h2>Registrar movimiento</h2>
+        <div class="section-heading">
+          <div>
+            <h2>Registrar movimiento</h2>
+            <p class="section-subtitle">Guarda ingresos, gastos y pagos de forma rápida.</p>
+          </div>
+        </div>
 
         <div class="movement-types" role="group" aria-label="Tipo de movimiento">
           <button type="button" class="type-button active" data-type="income">Ingreso</button>
@@ -48,6 +56,8 @@
           <button type="button" class="type-button" data-type="card_purchase">Gasto crédito</button>
           <button type="button" class="type-button" data-type="card_payment">Pago de tarjeta</button>
         </div>
+
+        <p id="movementHint" class="movement-hint">Los ingresos aumentan el saldo real.</p>
 
         <form id="movementForm" novalidate>
           <label for="amount">Monto</label>
@@ -173,6 +183,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app-v17.js"></script>
+  <script type="module" src="./app-v19.js"></script>
 </body>
 </html>

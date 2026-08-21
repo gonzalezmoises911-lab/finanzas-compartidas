@@ -1,10 +1,10 @@
-const CACHE_NAME = "finanzas-compartidas-v17";
+const CACHE_NAME = "finanzas-compartidas-v19";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./categories-v12.css",
-  "./app-v17.js",
+  "./app-v19.js",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png"
@@ -21,7 +21,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+      .then(keys => Promise.all(keys.map(key => key === CACHE_NAME ? Promise.resolve() : caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -38,11 +38,10 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Always prefer the network for the app's core files.
   if (
     event.request.mode === "navigate" ||
     url.pathname.endsWith("/index.html") ||
-    url.pathname.endsWith("/app-v17.js") ||
+    url.pathname.endsWith("/app-v19.js") ||
     url.pathname.endsWith("/styles.css") ||
     url.pathname.endsWith("/categories-v12.css") ||
     url.pathname.endsWith("/manifest.webmanifest")
@@ -59,7 +58,5 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
-  );
+  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
 });
