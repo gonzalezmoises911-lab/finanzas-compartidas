@@ -4,27 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07110d">
-  <title>Histórico general | Finanzas</title>
+  <title>Gastos de crédito | Finanzas</title>
   <link rel="icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css?v=23">
 </head>
-<body data-page="history">
+<body data-page="credit-history">
   <main class="app-shell inner-page">
     <header class="inner-header">
       <a class="back-link" href="./index.html" aria-label="Volver">←</a>
       <div>
-        <p class="eyebrow">ACUMULADO POR CATEGORÍA</p>
-        <h1>Histórico general</h1>
-        <p class="page-subtitle">Gastos agrupados por mes.</p>
+        <p class="eyebrow credit-eyebrow">TOTAL CRÉDITO</p>
+        <h1>Gastos de crédito</h1>
+        <p class="page-subtitle">Compras realizadas con tarjeta, agrupadas por mes.</p>
       </div>
       <div id="connectionStatus" class="status-pill compact" aria-live="polite">Conectando…</div>
     </header>
 
-    <div id="historyMonths" class="month-history-stack">
-      <section class="panel list-panel"><p class="empty-state">Cargando histórico…</p></section>
+    <div id="typedHistoryMonths" class="month-history-stack credit-history-stack">
+      <section class="panel list-panel"><p class="empty-state">Cargando gastos de crédito…</p></section>
     </div>
   </main>
 

@@ -1,15 +1,17 @@
-const CACHE_NAME = "finanzas-compartidas-v22";
+const CACHE_NAME = "finanzas-compartidas-v23";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./register.html",
   "./movement.html",
   "./history.html",
+  "./income-history.html",
+  "./credit-history.html",
   "./category.html",
   "./payments.html",
   "./payment-cycle.html",
   "./styles.css",
-  "./app-v21.js",
+  "./app-v23.js",
   "./manifest.webmanifest",
   "./bac-credomatic.png",
   "./colones-cr.png",

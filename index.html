@@ -6,13 +6,13 @@
   <meta name="theme-color" content="#07110d">
   <meta name="description" content="Finanzas compartidas: saldos, histórico y próximos pagos.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=22">
+  <link rel="manifest" href="./manifest.webmanifest?v=23">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=22">
+  <link rel="stylesheet" href="./styles.css?v=23">
 </head>
 <body data-page="home">
   <main class="app-shell home-shell">
@@ -25,7 +25,7 @@
     </header>
 
     <section class="balance-grid" aria-label="Resumen financiero">
-      <article class="balance-card cash-card">
+      <a class="balance-card cash-card clickable-balance" href="./income-history.html" aria-label="Ver depósitos del saldo real">
         <div class="balance-copy">
           <span>Saldo real</span>
           <strong id="currentBalance">₡0</strong>
@@ -33,9 +33,9 @@
         <div class="cash-photo" aria-label="Billetes de colones">
           <img src="./colones-cr.png" alt="Billetes de colones costarricenses">
         </div>
-      </article>
+      </a>
 
-      <article class="balance-card credit-card">
+      <a class="balance-card credit-card clickable-balance" href="./credit-history.html" aria-label="Ver gastos de crédito">
         <div class="balance-copy">
           <span>Total crédito</span>
           <strong id="cardBalance">₡0</strong>
@@ -43,7 +43,7 @@
         <div class="bac-logo-card" aria-label="BAC Credomatic">
           <img src="./bac-credomatic.png" alt="BAC Credomatic">
         </div>
-      </article>
+      </a>
     </section>
 
     <a class="history-entry" href="./history.html" aria-label="Abrir histórico general">
@@ -77,6 +77,6 @@
     </a>
   </nav>
 
-  <script type="module" src="./app-v21.js"></script>
+  <script type="module" src="./app-v23.js"></script>
 </body>
 </html>

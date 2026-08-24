@@ -622,3 +622,47 @@ select:focus,
   .category-row { grid-template-columns: auto 1fr auto; }
   .row-chevron { display: none; }
 }
+
+/* V23: tarjetas de saldo navegables + históricos por tipo */
+.clickable-balance {
+  cursor: pointer;
+  transition: transform .16s ease, filter .16s ease, border-color .16s ease;
+}
+.clickable-balance:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.035);
+}
+.clickable-balance:active {
+  transform: scale(.992);
+}
+.clickable-balance:focus-visible {
+  outline: 3px solid rgba(43,212,125,.38);
+  outline-offset: 3px;
+}
+.credit-card.clickable-balance:focus-visible {
+  outline-color: rgba(255,142,137,.45);
+}
+
+.typed-month-list {
+  margin-top: 14px;
+}
+.typed-history-item {
+  align-items: center;
+}
+.income-history-icon {
+  color: #9ff0c1;
+  background: rgba(43,212,125,.12);
+  font-weight: 800;
+}
+.credit-history-icon {
+  background: rgba(200,59,56,.14);
+}
+.typed-total-income {
+  color: #8ee8b5 !important;
+}
+.typed-total-credit {
+  color: #ff8e89 !important;
+}
+.credit-eyebrow {
+  color: #ff8e89;
+}
