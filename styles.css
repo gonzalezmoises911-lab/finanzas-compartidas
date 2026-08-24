@@ -207,6 +207,14 @@ h1, h2, p { margin-top: 0; }
   box-shadow: var(--shadow);
   transition: transform .16s ease, border-color .16s ease;
 }
+.history-entry + .history-entry { margin-top: 14px; }
+.payments-entry {
+  background: linear-gradient(135deg, #0f3425, #0a251a);
+}
+.payments-entry .history-entry-icon {
+  background: rgba(43,212,125,.16);
+  color: #dff7e9;
+}
 .history-entry:active { transform: scale(.99); }
 .history-entry-icon {
   width: 44px;
