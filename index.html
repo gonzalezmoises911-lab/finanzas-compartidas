@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#123c31">
-  <meta name="description" content="Finanzas compartidas: saldo, tarjeta, categorías e histórico.">
+  <meta name="theme-color" content="#07110d">
+  <meta name="description" content="Finanzas compartidas: saldos, histórico y próximos pagos.">
   <title>Finanzas Compartidas</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=20">
+  <link rel="manifest" href="./manifest.webmanifest?v=21">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=21">
 </head>
 <body data-page="home">
-  <main class="app-shell">
+  <main class="app-shell home-shell">
     <header class="topbar">
       <div>
         <p class="eyebrow">CONTROL COMPARTIDO</p>
@@ -30,8 +30,8 @@
           <span>Saldo real</span>
           <strong id="currentBalance">₡0</strong>
         </div>
-        <div class="money-stack" aria-hidden="true">
-          <i></i><i></i><b>₡</b>
+        <div class="cash-photo" aria-label="Billetes de colones">
+          <img src="./colones-cr.png" alt="Billetes de colones costarricenses">
         </div>
       </article>
 
@@ -40,82 +40,10 @@
           <span>Total crédito</span>
           <strong id="cardBalance">₡0</strong>
         </div>
-        <div class="bac-icon" aria-label="BAC">
-          <span class="bac-mark">▰▰▰</span>
-          <strong>BAC</strong>
+        <div class="bac-logo-card" aria-label="BAC Credomatic">
+          <img src="./bac-credomatic.png" alt="BAC Credomatic">
         </div>
       </article>
-    </section>
-
-    <section class="panel movement-panel">
-      <div class="panel-heading">
-        <h2>Registrar movimiento</h2>
-      </div>
-
-      <div class="movement-types" role="group" aria-label="Tipo de movimiento">
-        <button type="button" class="type-button active" data-type="income">Ingreso</button>
-        <button type="button" class="type-button" data-type="expense">Gasto débito</button>
-        <button type="button" class="type-button" data-type="card_purchase">Gasto crédito</button>
-        <button type="button" class="type-button" data-type="card_payment">Pago tarjeta</button>
-      </div>
-
-      <form id="movementForm" novalidate>
-        <div class="field-grid">
-          <div class="field-group">
-            <label for="amount">Monto</label>
-            <div class="input-with-prefix">
-              <span>₡</span>
-              <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label for="date">Fecha</label>
-            <input id="date" name="date" type="date" required>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="description">Descripción</label>
-          <input id="description" name="description" type="text" maxlength="100" placeholder="Ej. Supermercado, gasolina, Amazon…" required>
-        </div>
-
-        <div id="categoryField" class="field-group" hidden>
-          <label for="category">Categoría</label>
-          <select id="category" name="category">
-            <option value="">Seleccionar categoría…</option>
-            <option value="Comida rápida">🍔 Comida rápida</option>
-            <option value="Supermercado">🛒 Supermercado</option>
-            <option value="Carnicería">🥩 Carnicería</option>
-            <option value="Farmacia">💊 Farmacia</option>
-            <option value="Veterinaria">🐾 Veterinaria</option>
-            <option value="Servicios públicos">💡 Servicios públicos</option>
-            <option value="Mantenimiento vehículo">🔧 Mantenimiento vehículo</option>
-            <option value="Bancos">🏦 Bancos</option>
-            <option value="Servicios de casa">🏠 Servicios de casa</option>
-            <option value="Compras en línea">📦 Compras en línea</option>
-            <option value="Aseo">🧹 Aseo</option>
-            <option value="Ocio y entretenimiento">🎬 Ocio y entretenimiento</option>
-          </select>
-        </div>
-
-        <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
-        <button id="cancelEditButton" type="button" hidden class="secondary-button">Cancelar edición</button>
-        <p id="formMessage" class="form-message" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <section class="panel summary-panel">
-      <div class="panel-heading split-heading">
-        <div>
-          <p class="section-kicker">RESUMEN DEL MES</p>
-          <h2>Acumulado por categoría</h2>
-        </div>
-        <span id="categoryPeriod" class="month-chip"></span>
-      </div>
-      <div id="categorySummary" class="category-summary">
-        <p class="empty-state">Todavía no hay gastos este mes.</p>
-      </div>
     </section>
 
     <a class="history-entry" href="./history.html" aria-label="Abrir histórico general">
@@ -128,6 +56,18 @@
     </a>
   </main>
 
-  <script type="module" src="./app-v20.js"></script>
+  <nav class="bottom-dock" aria-label="Menú principal">
+    <a class="dock-item active" href="./index.html" aria-current="page">
+      <span class="dock-icon">⌂</span><small>Inicio</small>
+    </a>
+    <a class="dock-item" href="./register.html">
+      <span class="dock-icon">＋</span><small>Registrar</small>
+    </a>
+    <a class="dock-item" href="./payments.html">
+      <span class="dock-icon">✓</span><small>Próximos pagos</small>
+    </a>
+  </nav>
+
+  <script type="module" src="./app-v21.js"></script>
 </body>
 </html>

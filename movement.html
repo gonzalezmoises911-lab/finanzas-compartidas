@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07110d">
+  <title>Movimiento | Finanzas</title>
+  <link rel="icon" href="./icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=21">
+</head>
+<body data-page="movement">
+  <main class="app-shell inner-page form-page">
+    <header class="inner-header">
+      <a id="movementBack" class="back-link" href="./register.html" aria-label="Volver">←</a>
+      <div>
+        <p id="movementKicker" class="eyebrow">REGISTRAR MOVIMIENTO</p>
+        <h1 id="movementTitle">Movimiento</h1>
+      </div>
+      <div id="connectionStatus" class="status-pill compact" aria-live="polite">Conectando…</div>
+    </header>
+
+    <section class="panel form-panel">
+      <div id="movementTypeBadge" class="movement-type-badge">Movimiento</div>
+      <form id="movementForm" novalidate>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="amount">Monto</label>
+            <div class="input-with-prefix">
+              <span>₡</span>
+              <input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" required>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="date">Fecha</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="description">Descripción</label>
+          <input id="description" name="description" type="text" maxlength="100" placeholder="Ej. Supermercado, gasolina, Amazon…" required>
+        </div>
+
+        <div id="categoryField" class="field-group" hidden>
+          <label for="category">Categoría</label>
+          <select id="category" name="category">
+            <option value="">Seleccionar categoría…</option>
+            <option value="Comida rápida">🍔 Comida rápida</option>
+            <option value="Supermercado">🛒 Supermercado</option>
+            <option value="Carnicería">🥩 Carnicería</option>
+            <option value="Farmacia">💊 Farmacia</option>
+            <option value="Veterinaria">🐾 Veterinaria</option>
+            <option value="Servicios públicos">💡 Servicios públicos</option>
+            <option value="Mantenimiento vehículo">🔧 Mantenimiento vehículo</option>
+            <option value="Bancos">🏦 Bancos</option>
+            <option value="Servicios de casa">🏠 Servicios de casa</option>
+            <option value="Compras en línea">📦 Compras en línea</option>
+            <option value="Aseo">🧹 Aseo</option>
+            <option value="Ocio y entretenimiento">🎬 Ocio y entretenimiento</option>
+          </select>
+        </div>
+
+        <button id="saveButton" class="primary-button" type="submit">Guardar movimiento</button>
+        <p id="formMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="./app-v21.js"></script>
+</body>
+</html>

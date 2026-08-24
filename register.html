@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07110d">
+  <title>Registrar movimiento | Finanzas</title>
+  <link rel="icon" href="./icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=21">
+</head>
+<body data-page="register">
+  <main class="app-shell inner-page">
+    <header class="inner-header">
+      <a class="back-link" href="./index.html" aria-label="Volver">←</a>
+      <div>
+        <p class="eyebrow">NUEVO MOVIMIENTO</p>
+        <h1>Registrar</h1>
+        <p class="page-subtitle">Elige qué quieres registrar.</p>
+      </div>
+      <div id="connectionStatus" class="status-pill compact" aria-live="polite">Conectando…</div>
+    </header>
+
+    <section class="choice-grid" aria-label="Tipo de movimiento">
+      <a class="choice-card income-choice" href="./movement.html?type=income">
+        <span class="choice-icon">↓</span>
+        <span><strong>Ingreso</strong><small>Dinero que entra</small></span>
+        <b>›</b>
+      </a>
+      <a class="choice-card" href="./movement.html?type=expense">
+        <span class="choice-icon">−</span>
+        <span><strong>Gasto débito</strong><small>Pago directo de la cuenta</small></span>
+        <b>›</b>
+      </a>
+      <a class="choice-card credit-choice" href="./movement.html?type=card_purchase">
+        <span class="choice-icon">▣</span>
+        <span><strong>Gasto crédito</strong><small>Compra hecha con tarjeta</small></span>
+        <b>›</b>
+      </a>
+      <a class="choice-card payment-choice" href="./movement.html?type=card_payment">
+        <span class="choice-icon">✓</span>
+        <span><strong>Pago de tarjeta</strong><small>Reduce el Total crédito</small></span>
+        <b>›</b>
+      </a>
+    </section>
+  </main>
+
+  <nav class="bottom-dock" aria-label="Menú principal">
+    <a class="dock-item" href="./index.html"><span class="dock-icon">⌂</span><small>Inicio</small></a>
+    <a class="dock-item active" href="./register.html" aria-current="page"><span class="dock-icon">＋</span><small>Registrar</small></a>
+    <a class="dock-item" href="./payments.html"><span class="dock-icon">✓</span><small>Próximos pagos</small></a>
+  </nav>
+
+  <script type="module" src="./app-v21.js"></script>
+</body>
+</html>
