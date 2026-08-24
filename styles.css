@@ -666,3 +666,95 @@ select:focus,
 .credit-eyebrow {
   color: #ff8e89;
 }
+
+/* V24: ajustes manuales protegidos por PIN */
+.adjustment-stack {
+  display: grid;
+  gap: 14px;
+}
+.adjustment-card {
+  padding: 20px;
+  background: linear-gradient(145deg, #123a29, #0b2419 78%);
+}
+.adjustment-card-credit {
+  background: linear-gradient(145deg, rgba(200,59,56,.24), #211613 78%);
+  border-color: rgba(239,91,87,.18);
+}
+.adjustment-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.adjustment-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .05em;
+}
+.adjustment-card-head strong {
+  display: block;
+  font-size: clamp(1.75rem, 7vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -.055em;
+}
+.adjust-edit-button {
+  flex: 0 0 auto;
+  border: 1px solid rgba(43,212,125,.24);
+  border-radius: 13px;
+  padding: 10px 14px;
+  background: rgba(43,212,125,.11);
+  color: #aaf0c7;
+  font-size: 11px;
+  font-weight: 800;
+}
+.adjust-edit-button.credit {
+  border-color: rgba(255,142,137,.22);
+  background: rgba(200,59,56,.13);
+  color: #ffaaa7;
+}
+.adjustment-edit-area {
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+}
+.adjustment-save { margin-top: 2px; }
+.credit-prefix span { color: #ff8e89; }
+
+.pin-dialog {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.pin-dialog::backdrop {
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(7px);
+}
+.pin-card {
+  width: min(90vw, 350px);
+  min-width: 0;
+  text-align: center;
+}
+.pin-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 17px;
+  background: rgba(43,212,125,.12);
+  border: 1px solid rgba(43,212,125,.15);
+  font-size: 23px;
+}
+.pin-card h2 { margin-bottom: 6px; }
+.pin-card p { margin-bottom: 15px; }
+.pin-input {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: .32em;
+  padding-left: calc(15px + .32em);
+}
+.pin-submit { margin-top: 12px; }

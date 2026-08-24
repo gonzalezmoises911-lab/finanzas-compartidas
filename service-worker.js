@@ -1,4 +1,4 @@
-const CACHE_NAME = "finanzas-compartidas-v23";
+const CACHE_NAME = "finanzas-compartidas-v24";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -10,8 +10,9 @@ const APP_SHELL = [
   "./category.html",
   "./payments.html",
   "./payment-cycle.html",
+  "./adjustments.html",
   "./styles.css",
-  "./app-v23.js",
+  "./app-v24.js",
   "./manifest.webmanifest",
   "./bac-credomatic.png",
   "./colones-cr.png",
